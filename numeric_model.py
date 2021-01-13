@@ -25,15 +25,15 @@ class NumericModel:
         self.particle_vector = particle_vector
         self.log = ""
 
-    def mod_import(self):
+    def start_model_processing(self):
         try:
             with open(self.file_path) as data_file:
-                e = EnergyWaste(material=Materials.AIR, dist=1, constants=Constants.CONSTANTS)
+                e = EnergyWaste(material=Materials.SILICON, dist=1, constants=Constants.CONSTANTS)
                 print(e.energy_waste())
-                # new_dat_x, new_dat_y, new_dat_z = self.separated_axes_values(data_file)
-                # self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z)
-                # new_dat_x, new_dat_y, new_dat_z = self.generate_model()
-                # self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z)
+                new_dat_x, new_dat_y, new_dat_z = self.separated_axes_values(data_file) # Function creates data table x, y, z from exported map in txt format
+                # self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z) # Function creates 2d visualisation of waste energy based on distance between two points
+                # new_dat_x, new_dat_y, new_dat_z = self.generate_model() # Function creates random model based on Perlin Noise
+                self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z) # Function shows data after cut (low_x, low_y, max_x.. etc..)
         except IndexError or IOError as e:
             self.log += "\n" + e
         finally:
@@ -46,6 +46,8 @@ class NumericModel:
         new_dat_x = []
         new_dat_y = []
         new_dat_z = []
+        self.model_data = sorted(self.model_data, key=lambda data: data[0])
+        print(self.model_data)
         if self.cut:
             for dat in self.model_data:
                 if self.low_x < dat[0] < self.max_x and self.low_y < dat[1] < self.max_y:
