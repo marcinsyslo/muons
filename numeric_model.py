@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import defaultdict
 
-
-from particle import Particle
 from materials import Materials
 from constants import Constants
 from bethe_formula import EnergyWaste
@@ -70,7 +67,7 @@ class NumericModel:
         noise = PerlinNoise(octaves=10, seed=1)
         xpix, ypix = 100, 100
         pic = [[noise([i / xpix, j / ypix]) for j in range(xpix)] for i in range(ypix)]
-        return pic[0], pic[2], pic[1]
+        return pic[0], pic[1], pic[2]
 
     @staticmethod
     def create_2d_vis(dat_x, dat_y, dat_z):
@@ -81,22 +78,26 @@ class NumericModel:
             dat.append([x, dat_y[i], dat_z[i]])
             i += 1
         sorted_x = sorted(dat, key=lambda x_d: x_d[0])
-        sorted_y = sorted(dat, key=lambda y_d: y_d[1])
         temp_x_y = []
         i = 0
         for x in sorted_x:
             temp_x_y.append([i,x[0],x[1],x[2]])
             i += 1
-        print(temp_x_y)
         sorted_x_y = sorted(temp_x_y, key=lambda x: x[2]) # [x_index, x,y(sorted),z]
-        print(sorted_x_y)
-
-    @staticmethod
-    def check_dist_underground(x, y, z, dat_x, dat_y, dat_z, vec=None):
-        if vec is None:
-            vec = [1, 0, 0]
-        muon = Particle(size=1, x=x, y=y, z=z)
-        r = len(dat_x)
+        z_table = []
+        for data in sorted_x_y:
+            z_table.append(data[3])
+        z_table.sort()
+        slices_z = []
+        k = 0
+        for z in z_table:
+            slices_z.append([k])
+            for data in sorted_x_y:
+                if z == data[3]:
+                    slices_z[k].append(data)
+            k+=1
+        for slice_z in slices_z:
+            pass
 
     @staticmethod
     def model_plot_3d(new_dat_x, new_dat_y, new_dat_z):
