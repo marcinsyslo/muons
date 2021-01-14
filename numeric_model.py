@@ -34,6 +34,7 @@ class NumericModel:
                 # self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z) # Function creates 2d visualisation of waste energy based on distance between two points
                 # new_dat_x, new_dat_y, new_dat_z = self.generate_model() # Function creates random model based on Perlin Noise
                 self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z) # Function shows data after cut (low_x, low_y, max_x.. etc..)
+
         except IndexError or IOError as e:
             self.log += "\n" + e
         finally:
