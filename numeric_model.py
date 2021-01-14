@@ -36,7 +36,7 @@ class NumericModel:
                 self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z) # Function shows data after cut (low_x, low_y, max_x.. etc..)
 
         except IndexError or IOError as e:
-            self.log += "\n" + e
+            self.log = e
         finally:
             print(self.log)
 
