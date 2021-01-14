@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import defaultdict
 
 
 from particle import Particle
@@ -28,11 +29,10 @@ class NumericModel:
     def start_model_processing(self):
         try:
             with open(self.file_path) as data_file:
-                e = EnergyWaste(material=Materials.SILICON, dist=1, constants=Constants.CONSTANTS)
-                print(e.energy_waste())
                 new_dat_x, new_dat_y, new_dat_z = self.separated_axes_values(data_file) # Function creates data table x, y, z from exported map in txt format
                 # self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z) # Function creates 2d visualisation of waste energy based on distance between two points
                 # new_dat_x, new_dat_y, new_dat_z = self.generate_model() # Function creates random model based on Perlin Noise
+                self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z)
                 self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z) # Function shows data after cut (low_x, low_y, max_x.. etc..)
 
         except IndexError or IOError as e:
@@ -47,8 +47,6 @@ class NumericModel:
         new_dat_x = []
         new_dat_y = []
         new_dat_z = []
-        self.model_data = sorted(self.model_data, key=lambda data: data[0])
-        print(self.model_data)
         if self.cut:
             for dat in self.model_data:
                 if self.low_x < dat[0] < self.max_x and self.low_y < dat[1] < self.max_y:
@@ -76,8 +74,22 @@ class NumericModel:
 
     @staticmethod
     def create_2d_vis(dat_x, dat_y, dat_z):
-        state_cords = []
-        return 0
+        e = EnergyWaste(material=Materials.SILICON, dist=1, constants=Constants.CONSTANTS)
+        dat = []
+        i = 0
+        for x in dat_x:
+            dat.append([x, dat_y[i], dat_z[i]])
+            i += 1
+        sorted_x = sorted(dat, key=lambda x_d: x_d[0])
+        sorted_y = sorted(dat, key=lambda y_d: y_d[1])
+        temp_x_y = []
+        i = 0
+        for x in sorted_x:
+            temp_x_y.append([i,x[0],x[1],x[2]])
+            i += 1
+        print(temp_x_y)
+        sorted_x_y = sorted(temp_x_y, key=lambda x: x[2]) # [x_index, x,y(sorted),z]
+        print(sorted_x_y)
 
     @staticmethod
     def check_dist_underground(x, y, z, dat_x, dat_y, dat_z, vec=None):
