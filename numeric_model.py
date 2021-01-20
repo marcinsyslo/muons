@@ -4,6 +4,7 @@ import numpy as np
 from materials import Materials
 from constants import Constants
 from bethe_formula import EnergyWaste
+from units import Units
 
 from resources.perlin_noise import PerlinNoise
 
@@ -26,18 +27,19 @@ class NumericModel:
     def start_model_processing(self):
         try:
             with open(self.file_path) as data_file:
-                new_dat_x, new_dat_y, new_dat_z = self.separated_axes_values(data_file) # Function creates data table x, y, z from exported map in txt format
+                new_dat_x, new_dat_y, new_dat_z = self.separated_axes_values_from_file(
+                    data_file)  # Function creates data table x, y, z from exported map in txt format
                 # self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z) # Function creates 2d visualisation of waste energy based on distance between two points
                 # new_dat_x, new_dat_y, new_dat_z = self.generate_model() # Function creates random model based on Perlin Noise
-                self.create_2d_vis(new_dat_x, new_dat_y, new_dat_z)
-                self.model_plot_3d(new_dat_x, new_dat_y, new_dat_z) # Function shows data after cut (low_x, low_y, max_x.. etc..)
+                x, y, z = self.separated_axes_values(self.create_2d_vis(new_dat_z, res=30))
+                self.model_plot_3d(x, y, z)  # Function shows data after cut (low_x, low_y, max_x.. etc..)
 
         except IndexError or IOError as e:
             self.log = e
         finally:
             print(self.log)
 
-    def separated_axes_values(self, data_file):
+    def separated_axes_values_from_file(self, data_file):
         for line in data_file:
             line_temp = line.split(',')
             self.model_data.append([float(line_temp[0]), float(line_temp[1]), float(line_temp[2])])
@@ -51,6 +53,14 @@ class NumericModel:
         else:
             for dat in self.model_data:
                 self.append_data_to_separate_array(dat, new_dat_x, new_dat_y, new_dat_z)
+        return new_dat_x, new_dat_y, new_dat_z
+
+    def separated_axes_values(self, data):
+        new_dat_x = []
+        new_dat_y = []
+        new_dat_z = []
+        for dat in self.model_data:
+            self.append_data_to_separate_array(dat, new_dat_x, new_dat_y, new_dat_z)
         return new_dat_x, new_dat_y, new_dat_z
 
     def get_numeric_model(self):
@@ -70,34 +80,47 @@ class NumericModel:
         return pic[0], pic[1], pic[2]
 
     @staticmethod
-    def create_2d_vis(dat_x, dat_y, dat_z):
-        e = EnergyWaste(material=Materials.SILICON, dist=1, constants=Constants.CONSTANTS)
-        dat = []
-        i = 0
-        for x in dat_x:
-            dat.append([x, dat_y[i], dat_z[i]])
-            i += 1
-        sorted_x = sorted(dat, key=lambda x_d: x_d[0])
-        temp_x_y = []
-        i = 0
-        for x in sorted_x:
-            temp_x_y.append([i,x[0],x[1],x[2]])
-            i += 1
-        sorted_x_y = sorted(temp_x_y, key=lambda x: x[2]) # [x_index, x,y(sorted),z]
-        z_table = []
-        for data in sorted_x_y:
-            z_table.append(data[3])
-        z_table.sort()
-        slices_z = []
-        k = 0
-        for z in z_table:
-            slices_z.append([k])
-            for data in sorted_x_y:
-                if z == data[3]:
-                    slices_z[k].append(data)
-            k+=1
-        for slice_z in slices_z:
-            pass
+    def create_2d_vis(dat_z, res=30):
+        e_s = EnergyWaste(material=Materials.SILICON, constants=Constants.CONSTANTS)
+        e_c = EnergyWaste(material=Materials.CARBON, constants=Constants.CONSTANTS)
+        x_y_tab = []
+        k = 50
+        for i in range(res):
+            for j in range(res):
+                x_y_tab.append([i, j, dat_z[k]])
+                k += 1
+        temp = []
+        for cord in x_y_tab:
+            temp.append([cord[0], cord[1], e_s.energy_waste(unit=Units.MEV, dist=cord[2])[0]])
+        return temp
+
+        # dat = []
+        # i = 0
+        # for x in dat_x:
+        #     dat.append([x, dat_y[i], dat_z[i]])
+        #     i += 1
+        # sorted_x = sorted(dat, key=lambda x_d: x_d[0])
+        # temp_x_y = []
+        # i = 0
+        # for x in sorted_x:
+        #     temp_x_y.append([i,x[0],x[1],x[2]])
+        #     i += 1
+        # sorted_x_y = sorted(temp_x_y, key=lambda x: x[2]) # [x_index, x,y(sorted),z]
+        # z_table = []
+        # for data in sorted_x_y:
+        #     z_table.append(data[3])
+        # z_table.sort()
+        # slices_z = []
+        # k = 0
+        # for z in z_table:
+        #     slices_z.append([k])
+        #     for data in sorted_x_y:
+        #         if z == data[3]:
+        #             slices_z[k].append(data)
+        #     k+=1
+        #     j = 0
+        # for slice_z in slices_z:
+        #     pass
 
     @staticmethod
     def model_plot_3d(new_dat_x, new_dat_y, new_dat_z):
