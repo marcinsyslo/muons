@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import logging as log
 
 from materials import Materials
 from constants import Constants
@@ -11,9 +12,7 @@ from resources.perlin_noise import PerlinNoise
 
 class NumericModel:
     def __init__(self, file_path="", cut=None, low_x=-9999, low_y=-9999,
-                 max_x=9999, max_y=9999, particle_vector=None):
-        if particle_vector is None:
-            particle_vector = [1, 0, 0]  # surface
+                 max_x=9999, max_y=9999):
         self.file_path = file_path
         self.low_x = low_x
         self.low_y = low_y
@@ -21,8 +20,6 @@ class NumericModel:
         self.max_y = max_y
         self.model_data = []
         self.cut = cut
-        self.particle_vector = particle_vector
-        self.log = ""
 
     def start_model_processing(self):
         try:
@@ -34,10 +31,9 @@ class NumericModel:
                 x, y, z = self.separated_axes_values(self.create_2d_vis(new_dat_z, res=30))
                 self.model_plot_3d(x, y, z)  # Function shows data after cut (low_x, low_y, max_x.. etc..)
 
-        except IndexError or IOError as e:
-            self.log = e
-        finally:
-            print(self.log)
+        except IndexError or IOError or FileNotFoundError as e:
+            log.critical(
+                f"{e} | LOCATION OF EXCEPTION: {self.__class__.__name__} | method: {self.start_model_processing().__name__}")
 
     def separated_axes_values_from_file(self, data_file):
         for line in data_file:
@@ -83,7 +79,7 @@ class NumericModel:
     def create_2d_vis(dat_z, res=30):
         e_s = EnergyWaste(material=Materials.SILICON, constants=Constants.CONSTANTS)
         e_c = EnergyWaste(material=Materials.CARBON, constants=Constants.CONSTANTS)
-        x_y_tab = []
+        x_y_tab = [[]]
         k = 50
         for i in range(res):
             for j in range(res):
