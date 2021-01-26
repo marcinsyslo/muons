@@ -94,34 +94,6 @@ class NumericModel:
             temp.append([cord[0], cord[1], e_s.energy_waste(unit=Units.MEV, dist=cord[2])[0]])
         return temp
 
-        # dat = []
-        # i = 0
-        # for x in dat_x:
-        #     dat.append([x, dat_y[i], dat_z[i]])
-        #     i += 1
-        # sorted_x = sorted(dat, key=lambda x_d: x_d[0])
-        # temp_x_y = []
-        # i = 0
-        # for x in sorted_x:
-        #     temp_x_y.append([i,x[0],x[1],x[2]])
-        #     i += 1
-        # sorted_x_y = sorted(temp_x_y, key=lambda x: x[2]) # [x_index, x,y(sorted),z]
-        # z_table = []
-        # for data in sorted_x_y:
-        #     z_table.append(data[3])
-        # z_table.sort()
-        # slices_z = []
-        # k = 0
-        # for z in z_table:
-        #     slices_z.append([k])
-        #     for data in sorted_x_y:
-        #         if z == data[3]:
-        #             slices_z[k].append(data)
-        #     k+=1
-        #     j = 0
-        # for slice_z in slices_z:
-        #     pass
-
     @staticmethod
     def model_plot_3d(new_dat_x, new_dat_y, new_dat_z):
         fig = plt.figure()
