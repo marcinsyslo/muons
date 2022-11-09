@@ -11,7 +11,7 @@ class Constants:
         "speed of light": 3e8,
         "muon speed": 0.994,  # B = v/c
         "muon mass": 1.8835e-28,
-        "PI": math.pi
+        "PI": math.pi,
         "earthR": 6.4e8,  # m
         "chapmanD": 600,
     }
